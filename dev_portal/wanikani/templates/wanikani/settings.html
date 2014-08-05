@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<form action="{% url 'wanikani:setkey' %}" method="post">
+  {% csrf_token %}
+  <label>API Key</label><input type="text" name="apikey" value="{{ user.wkuser.apikey}}"/>
+</form>
+{% endblock %}
