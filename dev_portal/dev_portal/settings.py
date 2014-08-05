@@ -17,9 +17,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# TODO: replace this with autogenerating key.
 SECRET_KEY = '0)ib^q%%mha3l7nifrthw2k=1)yk4g*hn4d7&#@)&8!@y)u3lx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# TODO: turn this off before deployment
 DEBUG = True
 
 TEMPLATE_DEBUG = True
@@ -85,7 +87,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-#Celery settings
+# Celery settings
+# TODO: change this
 BROKER_URL = 'amqp://wkuser:ilikepasswords@localhost//'
 CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend'
 CELERY_RESULT_BACKEND='djcelery.backends.cache:CacheBackend'
