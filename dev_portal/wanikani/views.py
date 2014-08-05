@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from wanikani.models import WKUser
 import requests
+from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
 from django.http import HttpResponse
 
@@ -94,17 +95,20 @@ def details(request):
 @login_required
 def setkey(request):
   #set the apikey for the user
+
   try:
     new_key = request.POST['apikey']
   except (KeyError):
     return render(request, 'wanikani/settings.html')
   else:
-    if request.user.wkuser is None:
+    try:
+      request.user.wkuser
+    except ObjectDoesNotExist:
       wk = WKUser(apikey=new_key, user=request.user)
       wk.save()
-    else:
-      request.user.wkuser.apikey = new_key
-      request.user.wkuser.save()
+
+    request.user.wkuser.apikey = new_key
+    request.user.wkuser.save()
   return render(request, 'wanikani/settings.html')
 
 @login_required

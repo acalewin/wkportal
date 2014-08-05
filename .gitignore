@@ -71,3 +71,4 @@ local_settings.py
 [Ll]ib
 [Ss]cripts
 
+*.sqlite3
