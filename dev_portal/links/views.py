@@ -23,3 +23,6 @@ def list(request):
             serializers.serialize('json',
               Link.objects.filter(user=request.user)),
             content_type='application/json')
+
+def mainjs(request):
+  return render(request, 'links/js/main.js', content_type='application/javascript')

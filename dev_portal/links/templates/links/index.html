@@ -1,13 +1,1 @@
 {% extends "base.html" %}
-{% block content %}
-{% if list %}
-  <ul class='list list-unstyled'>
-    {% for link in list %}
-      <li><a href="{{ link.url }}">{{ link.title }}</a>
-         - <a href="{% url 'links:details' link.id %}">Details</a></li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No links to display</p>
-{% endif %}
-{% endblock %}
