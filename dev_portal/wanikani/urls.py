@@ -6,4 +6,5 @@ urlpatterns = patterns('',
   url(r'^details/', views.details, name='details'),
   url(r'^setkey/', views.setkey, name='setkey'),
   url(r'^kanji/', views.kanji, name='kanji'),
+  url(r'^vocab/', views.vocab, name='vocab'),
 )
