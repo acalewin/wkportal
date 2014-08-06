@@ -9,6 +9,20 @@ class WKUser(models.Model):
   user = models.OneToOneField(User)
   level = models.IntegerField(default=1)
 
+  def grade_sentence_kanji(self, sent):
+    grade = list()
+    for c in sent:
+      k = kanji=Kanji.objects.filter(character=c).first()
+      if k:
+        stat = KanjiStatus.objects.filter(user=self, kanji=k).first()
+      else:
+        stat = None 
+      if stat:
+        grade.append(dict(character=c, status=stat.srs))
+      else:
+        grade.append(dict(character=c, status=''))
+    return grade
+
   def __str__(self):
     return self.user.username
 
@@ -31,6 +45,7 @@ class KanjiStatus(models.Model):
 
   def __str__(self):
     return "%s - %s" % (str(self.user), str(self.kanji))
+
 
   class Meta:
     unique_together = (('user', 'kanji'),)
