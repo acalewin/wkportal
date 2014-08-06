@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from wanikani.models import WKUser
+from wanikani.models import WKUser, KanjiStatus, VocabStatus
 import requests
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
 from django.http import HttpResponse
+from datetime import timedelta, datetime
+import wanikani.tasks
+import pytz
 
 class Pynikani:
   def __init__(self, apikey):
@@ -104,7 +107,8 @@ def setkey(request):
     try:
       request.user.wkuser
     except ObjectDoesNotExist:
-      wk = WKUser(apikey=new_key, user=request.user)
+      wk = WKUser(apikey=new_key, user=request.user,
+        kanji_refresh=datetime(1900,1,1), vocab_refresh=datetime(1900,1,1))
       wk.save()
 
     request.user.wkuser.apikey = new_key
@@ -112,7 +116,7 @@ def setkey(request):
   return render(request, 'wanikani/settings.html')
 
 @login_required
-def kanji(request):
+def kanji(request, ):
   wkdata = request.user.wkuser
 
   if wkdata:
@@ -120,8 +124,30 @@ def kanji(request):
   else:
     return render(request, 'wanikani/error.html', {'error': "No key found"})
 
-  pyni = Pynikani(apikey=key)
-  return HttpResponse(
-            serializers.serialize('json',
-              pyni.kanji()),
-            content_type='application/json')
+  if datetime.now(pytz.utc) - wkdata.kanji_refresh > timedelta(minutes=30):
+    wanikani.tasks.get_kanji.delay(request.user)
+    return HttpResponse("Job queued as a background task")
+  else:
+    pyni = Pynikani(key)
+    return HttpResponse(
+              serializers.serialize('json',
+              KanjiStatus.objects.filter(user=request.user.wkuser)),
+              content_type='application/json')
+
+@login_required
+def vocab(request):
+  wkdata = request.user.wkuser
+
+  if wkdata:
+    key = wkdata.apikey
+  else:
+    return render(request, 'wanikani/error.html', {'error': "No key found"})
+
+  if datetime.now(pytz.utc) - wkdata.vocab_refresh > timedelta(minutes=30):
+    wanikani.tasks.get_vocab.delay(request.user)
+    return HttpResponse("Job queued as a background task")
+  else:
+    return HttpResponse(
+              serializers.serialize('json',
+                VocabStatus.objects.filter(user=request.user.wkuser)),
+              content_type='application/json')
