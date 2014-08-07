@@ -74,8 +74,16 @@ App.GradesentenceController = Ember.Controller.extend({
         {apikey: this.get('apikey'),
         csrfmiddlewaretoken: App.get('CSRFToken')},
         function(data) {
-          alert('stuff!');
+          alert('saved key!');
         })
-    }
+    },
+    savesentence: function() {
+      $.post("{% url 'wanikani:savesentence'%}",
+        {sentence: this.get('jptext'),
+        csrfmiddlewaretoken: App.get('CSRFToken')},
+        function(data) {
+          alert('saved sentence!');
+        })
+    },
   }
 });

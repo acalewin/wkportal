@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from wanikani.models import WKUser, KanjiStatus, VocabStatus
+from wanikani.models import WKUser, KanjiStatus, VocabStatus, Sentence
 import requests
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
@@ -224,3 +224,36 @@ def gradekanji(request):
   return HttpResponse(json.dumps(
           Pynikani(apikey).grade_sentence_kanji(sentence)),
           content_type='application/json')
+
+@login_required
+def savesentence(request):
+  sentence = None
+  try:
+    sentence = request.POST['sentence']
+  except (KeyError):
+    return HttpResponse(json.dumps(
+      {'error': 'No sentence to save'}),
+      content_type='application/json')
+
+  s = Sentence(user=request.user.wkuser, sentence=sentence)
+  s.save()
+  return HttpResponse(json.dumps({
+    'message': 'Sentence saved'
+  }), content_type='application/json')
+
+@login_required
+def delsentence(request):
+  sentence = None
+  try:
+    sentence = request.POST['sentence']
+  except (KeyError):
+    return HttpResponse(json.dumps(
+      {'error': 'No sentence to delete'}),
+      content_type='application/json')
+
+  s = Sentence.objects.get(pk=sentence)
+  if s:
+    s.destroy()
+  return HttpResponse(json.dumps({
+    'message': 'Sentence deleted'
+  }), content_type='application/json')

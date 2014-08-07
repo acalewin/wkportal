@@ -29,6 +29,10 @@ class WKUser(models.Model):
   def __str__(self):
     return self.user.username
 
+class Sentence(models.Model):
+  user = models.ForeignKey(WKUser)
+  sentence = models.TextField()
+
 class Kanji(models.Model):
   character = models.CharField(max_length=50, unique=True)
   meaning = models.CharField(max_length=200)

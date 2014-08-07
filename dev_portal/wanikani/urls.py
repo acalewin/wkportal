@@ -9,4 +9,6 @@ urlpatterns = patterns('',
   url(r'^vocab/', views.vocab, name='vocab'),
   url(r'^counts/', views.counts, name='counts'),
   url(r'^gradekanji/', views.gradekanji, name='gradekanji'),
+  url(r'^savesentence/', views.savesentence, name='savesentence'),
+  url(r'^delsentence/', views.delsentence, name='delsentence'),
 )
