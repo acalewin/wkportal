@@ -78,6 +78,8 @@ level: level to retrieve radicals from"""
     """kanji api call
 level: level to retrieve kanji from"""
     data = self._call(resource='kanji', arg=level)
+    if not data:
+      return dict()
     return data.get('requested_information')
 
   def vocab(self, level=None):
@@ -194,15 +196,15 @@ def counts(request):
 
 def gradekanji(request):
   graded_sentence = None
+  sentence = None
   try:
     sentence = request.POST['sentence']
   except (KeyError):
     return HttpResponse(json.dumps(
       {'error': 'No sentence to parse'}),
       content_type='application/json')
-  else:
-    apikey = None
-    if request.user.is_authenticated():
+  apikey = None
+  if request.user.is_authenticated():
       try:
         wkinfo = request.user.wkuser
         apikey = wkinfo.apikey
@@ -212,13 +214,13 @@ def gradekanji(request):
       except (ObjectDoesNotExist):
         pass #Swallow this, we'll try the POST object next
 
-      if not apikey:
+  if not apikey:
         try:
-          apikey = requst.POST['apikey']
+          apikey = request.POST['apikey']
         except (KeyError):
           return HttpResponse(json.dumps(
-            {'error': 'No sapikey to use'}),
+            {'error': 'No apikey to use'}),
             content_type='application/json')
-        return HttpResponse(json.dumps(
+  return HttpResponse(json.dumps(
           Pynikani(apikey).grade_sentence_kanji(sentence)),
           content_type='application/json')

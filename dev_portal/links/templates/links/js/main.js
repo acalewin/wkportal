@@ -61,9 +61,9 @@ App.GradesentenceController = Ember.Controller.extend({
     grade: function(){
       var self = this;
       $.post("{% url 'wanikani:gradekanji'%}",
-        {sentence: this.get('jptext'),
+        {sentence: self.get('jptext'),
         csrfmiddlewaretoken: App.get('CSRFToken'),
-        apikey: this.get('apikey')},
+        apikey: self.get('apikey')},
         function(data) {
           self.set('graded_text', Ember.ArrayController.create());
           self.get('graded_text').pushObjects(data);

@@ -10,9 +10,12 @@ class LinkView(generic.DetailView):
   template_name = 'links/details.html'
 
 # Create your views here.
-@login_required
+#@login_required
 def index(request):
-  l = Link.objects.filter(user=request.user)
+  if request.user.is_authenticated():
+    l = Link.objects.filter(user=request.user)
+  else:
+    l = []
   #l = Link.objects.all()
   context  = {'list': l}
   return render(request, 'links/index.html', context)

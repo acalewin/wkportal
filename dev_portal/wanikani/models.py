@@ -30,11 +30,11 @@ class WKUser(models.Model):
     return self.user.username
 
 class Kanji(models.Model):
-  character = models.CharField(max_length=10, unique=True)
+  character = models.CharField(max_length=50, unique=True)
   meaning = models.CharField(max_length=200)
-  onyomi = models.CharField(max_length=10, default='')
-  kunyomi = models.CharField(max_length=10, default='')
-  important_reading = models.CharField(max_length=10)
+  onyomi = models.CharField(max_length=50, default='')
+  kunyomi = models.CharField(max_length=50, default='')
+  important_reading = models.CharField(max_length=50)
   level = models.IntegerField()
 
   def __str__(self):

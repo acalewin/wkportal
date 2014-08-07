@@ -4,8 +4,8 @@
    Author's custom styles
    ========================================================================== */
 
-span.burned{color: darkgrey;}
-span.enlightend{color: lightblue;}
-span.mastered{color: darkblue;}
-span.apprentice{color: pink;}
-span.guru{color: purple;}
+span.burned{color: #434343;}
+span.enlighten{color: #0093DD;}
+span.master{color: #294DDB;}
+span.apprentice{color: #DD0093;}
+span.guru{color: #882D9E;}
