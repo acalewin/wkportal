@@ -226,34 +226,10 @@ def gradekanji(request):
           content_type='application/json')
 
 @login_required
-def savesentence(request):
-  sentence = None
-  try:
-    sentence = request.POST['sentence']
-  except (KeyError):
-    return HttpResponse(json.dumps(
-      {'error': 'No sentence to save'}),
-      content_type='application/json')
+def listsentences(request, ):
+  wkdata = request.user.wkuser
 
-  s = Sentence(user=request.user.wkuser, sentence=sentence)
-  s.save()
-  return HttpResponse(json.dumps({
-    'message': 'Sentence saved'
-  }), content_type='application/json')
-
-@login_required
-def delsentence(request):
-  sentence = None
-  try:
-    sentence = request.POST['sentence']
-  except (KeyError):
-    return HttpResponse(json.dumps(
-      {'error': 'No sentence to delete'}),
-      content_type='application/json')
-
-  s = Sentence.objects.get(pk=sentence)
-  if s:
-    s.destroy()
-  return HttpResponse(json.dumps({
-    'message': 'Sentence deleted'
-  }), content_type='application/json')
+  return HttpResponse(
+              serializers.serialize('json',
+              Sentence.objects.filter(user=request.user.wkuser)),
+              content_type='application/json')

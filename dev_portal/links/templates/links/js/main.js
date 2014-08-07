@@ -1,3 +1,6 @@
+
+// TODO: Handle errors and display messages returned from the server
+
 App = Ember.Application.create({
   LOG_TRANSITIONS: true,
 });
@@ -5,7 +8,7 @@ App = Ember.Application.create({
 App.Router.map(function() {
   this.route('kanjidetails', {path: '/kanji/:id'});
   this.route('gradesentence');
-
+  this.route('listsentences');
 });
 
 App.LinkModel = Ember.Object.extend({
@@ -74,16 +77,18 @@ App.GradesentenceController = Ember.Controller.extend({
         {apikey: this.get('apikey'),
         csrfmiddlewaretoken: App.get('CSRFToken')},
         function(data) {
-          alert('saved key!');
+          alert('key saved!');
         })
-    },
-    savesentence: function() {
-      $.post("{% url 'wanikani:savesentence'%}",
-        {sentence: this.get('jptext'),
-        csrfmiddlewaretoken: App.get('CSRFToken')},
-        function(data) {
-          alert('saved sentence!');
-        })
-    },
+    }
   }
+});
+
+App.ListsentencesRoute = Ember.Route.extend({
+  model: function() {
+    return Ember.$.getJSON("{% url 'wanikani:listsentences' %}");
+  }
+});
+
+App.ListsentencesController = Ember.Controller.extend({
+
 });

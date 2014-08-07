@@ -66,6 +66,7 @@
         <li><a {{ bind-attr href=url }}>{{ title }}</a></li>
       {{/each}}
       <li>{{#link-to 'gradesentence'}}Grade Sentence{{/link-to}}</li>
+      <li>{{#link-to 'listsentences'}}Saved Sentences{{/link-to}}</li>
       </ul>
     </script>
     <script type="text/x-handlebars" data-template-name="gradesentence">
@@ -75,7 +76,6 @@
           {{textarea value=jptext cols="75" rows="10" class="form-control" placeholder="Ungraded text"}}
         </div>
         <button {{action 'grade' }} class="btn btn-primary">Grade</button>
-        <button {{action 'savesentence' }} class="btn">Save Sentence</button>
         </div>
         <div class="form-group">
         <div>{{input type="text" class="form-control" value=apikey placeholder="API Key"}}</div>
@@ -83,6 +83,13 @@
         </div>
       </form>
       <p>{{#each graded_text }}<span {{ bind-attr class=status}}>{{ character }}</span>{{/each}}</p>
+    </script>
+    <script type="text/x-handlebars" data-template-name="listsentences">
+      <ul class='list list-unstyled'>
+      {{#each model}}
+        <li>{{ fields.sentence }}</li>
+      {{/each}}
+      </ul>
     </script>
     {% endverbatim %}
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
