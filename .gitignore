@@ -72,3 +72,5 @@ local_settings.py
 [Ss]cripts
 
 *.sqlite3
+dev_portal/admin/
+dev_portal/static/
