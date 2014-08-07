@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from datetime import timedelta, datetime
 import wanikani.tasks
 import pytz
+import json
 
 class Pynikani:
   def __init__(self, apikey):
@@ -89,6 +90,30 @@ level: level to retrieve vocab from"""
     else:
       return retval.get('general')
 
+  def grade_sentence_kanji(self, sent):
+    """Grades a block of text passed in as sent and returns
+    a list of dicts that are the character and the srs level based on the
+    user's wanikani apikey"""
+    grade = list()
+    kanji_list = self.kanji()
+    for c in sent:
+      # known kanji information if any
+      kanji_info = next((x for x in kanji_list if x['character'] == c), None)
+      if not kanji_info: #we have no info for this kanji
+        grade.append(dict(character=c, status=''))
+        continue
+      srs_status = None
+      if 'user_specific' not in kanji_info:  # user hasn't seen this kanji
+        grade.append(dict(character=c, status=''))
+        continue
+      srs_status = kanji_info['user_specific']['srs']
+      grade.append(dict(character=c, status=srs_status))
+
+    return grade
+
+  def __str__(self):
+    return self.user.username
+
 
 # Create your views here.
 @login_required
@@ -102,7 +127,10 @@ def setkey(request):
   try:
     new_key = request.POST['apikey']
   except (KeyError):
-    return render(request, 'wanikani/settings.html')
+    return HttpResponse(
+      json.dumps(
+        {'error': 'No API key found user'}),
+        content_type='application/json')
   else:
     try:
       request.user.wkuser
@@ -113,7 +141,10 @@ def setkey(request):
 
     request.user.wkuser.apikey = new_key
     request.user.wkuser.save()
-  return render(request, 'wanikani/settings.html')
+  return HttpResponse(
+    json.dumps(
+      {'success': 'Key Saved'}),
+      content_type='application/json')
 
 @login_required
 def kanji(request, ):
@@ -122,14 +153,16 @@ def kanji(request, ):
   if wkdata:
     key = wkdata.apikey
   else:
-    return render(request, 'wanikani/error.html', {'error': "No key found"})
+    return HttpResponse(
+      json.dumps(
+        {'error': 'No API key found user'}),
+        content_type='application/json')
 
   if datetime.now(pytz.utc) - wkdata.kanji_refresh > timedelta(minutes=30):
     wanikani.tasks.get_kanji.delay(request.user)
-    return HttpResponse("Job queued as a background task")
-  else:
-    pyni = Pynikani(key)
-    return HttpResponse(
+    # message = 'Task queue for background.'
+
+  return HttpResponse(
               serializers.serialize('json',
               KanjiStatus.objects.filter(user=request.user.wkuser)),
               content_type='application/json')
@@ -141,7 +174,10 @@ def vocab(request):
   if wkdata:
     key = wkdata.apikey
   else:
-    return render(request, 'wanikani/error.html', {'error': "No key found"})
+    return HttpResponse(
+      serializers.serialize('json',
+        {'error': 'No API key found user'}),
+        content_type='application/json')
 
   if datetime.now(pytz.utc) - wkdata.vocab_refresh > timedelta(minutes=30):
     wanikani.tasks.get_vocab.delay(request.user)
@@ -151,3 +187,38 @@ def vocab(request):
               serializers.serialize('json',
                 VocabStatus.objects.filter(user=request.user.wkuser)),
               content_type='application/json')
+
+@login_required
+def counts(request):
+  pass
+
+def gradekanji(request):
+  graded_sentence = None
+  try:
+    sentence = request.POST['sentence']
+  except (KeyError):
+    return HttpResponse(json.dumps(
+      {'error': 'No sentence to parse'}),
+      content_type='application/json')
+  else:
+    apikey = None
+    if request.user.is_authenticated():
+      try:
+        wkinfo = request.user.wkuser
+        apikey = wkinfo.apikey
+        return HttpResponse(json.dumps(
+          wkinfo.grade_sentence_kanji(sentence)),
+          content_type='application/json')
+      except (ObjectDoesNotExist):
+        pass #Swallow this, we'll try the POST object next
+
+      if not apikey:
+        try:
+          apikey = requst.POST['apikey']
+        except (KeyError):
+          return HttpResponse(json.dumps(
+            {'error': 'No sapikey to use'}),
+            content_type='application/json')
+        return HttpResponse(json.dumps(
+          Pynikani(apikey).grade_sentence_kanji(sentence)),
+          content_type='application/json')

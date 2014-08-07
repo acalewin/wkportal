@@ -7,4 +7,6 @@ urlpatterns = patterns('',
   url(r'^setkey/', views.setkey, name='setkey'),
   url(r'^kanji/', views.kanji, name='kanji'),
   url(r'^vocab/', views.vocab, name='vocab'),
+  url(r'^counts/', views.counts, name='counts'),
+  url(r'^gradekanji/', views.gradekanji, name='gradekanji'),
 )

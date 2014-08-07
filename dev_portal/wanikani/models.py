@@ -10,13 +10,16 @@ class WKUser(models.Model):
   level = models.IntegerField(default=1)
 
   def grade_sentence_kanji(self, sent):
+    """Grades a block of text passed in as sent and returns
+    a list of dicts that are the character and the srs level based on the
+    user's wanikani apikey"""
     grade = list()
     for c in sent:
-      k = kanji=Kanji.objects.filter(character=c).first()
+      k=Kanji.objects.filter(character=c).first()
       if k:
         stat = KanjiStatus.objects.filter(user=self, kanji=k).first()
       else:
-        stat = None 
+        stat = None
       if stat:
         grade.append(dict(character=c, status=stat.srs))
       else:
