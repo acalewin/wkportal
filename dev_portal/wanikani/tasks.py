@@ -1,7 +1,6 @@
 from __future__ import absolute_import
-
 from celery import shared_task
-from wanikani.views import Pynikani
+from wanikani.pynikani import Pynikani
 from wanikani.models import Kanji, KanjiStatus
 from datetime import datetime
 from django.db.utils import IntegrityError
