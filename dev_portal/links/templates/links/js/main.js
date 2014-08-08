@@ -79,7 +79,15 @@ App.GradesentenceController = Ember.Controller.extend({
         function(data) {
           alert('key saved!');
         })
-    }
+    },
+    savesentence: function() {
+      $.post("{% url 'wanikani:savesentence'%}",
+        {sentence: this.get('jptext'),
+        csrfmiddlewaretoken: App.get('CSRFToken')},
+        function(data) {
+          alert('saved sentence!');
+        })
+    },
   }
 });
 
